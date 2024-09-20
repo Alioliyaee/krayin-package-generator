@@ -2,9 +2,9 @@
 
 namespace Webkul\PackageGenerator\Console\Command;
 
-use Illuminate\Support\Str;
-use Webkul\PackageGenerator\Generators\PackageGenerator;
+use Symfony\Component\Console\Attribute\AsCommand;
 
+#[AsCommand(name: 'package:make-provider')]
 class ProviderMakeCommand extends MakeCommand
 {
     /**
@@ -15,6 +15,13 @@ class ProviderMakeCommand extends MakeCommand
     protected $signature = 'package:make-provider {name} {package} {--force}';
 
     /**
+     * The type of class being generated.
+     *
+     * @var string
+     */
+    protected $type = 'Provider';
+
+    /**
      * The console command description.
      *
      * @var string
@@ -22,9 +29,9 @@ class ProviderMakeCommand extends MakeCommand
     protected $description = 'Create a new service provider.';
 
     /**
-     * @return mixed
+     * Get the stub file for the generator.
      */
-    protected function getStubContents()
+    protected function getStubContents(): string
     {
         $stub = $this->hasOption('plain') ? 'provider' : 'scaffold/package-provider';
 
@@ -32,24 +39,24 @@ class ProviderMakeCommand extends MakeCommand
     }
 
     /**
-     * @return array
+     * Get the stub variables.
      */
-    protected function getStubVariables()
+    protected function getStubVariables(): array
     {
         return [
-            'NAMESPACE'  => $this->getClassNamespace($this->argument('package') . '/Providers'),
+            'NAMESPACE'  => $this->getClassNamespace($this->argument('package').'/Providers'),
             'CLASS'      => $this->getClassName(),
             'LOWER_NAME' => $this->getLowerName(),
         ];
     }
 
     /**
-     * @return string
+     * Get the source file path.
      */
-    protected function getSourceFilePath()
+    protected function getSourceFilePath(): string
     {
-        $path = base_path('packages/' . $this->argument('package')) . '/src/Providers';
+        $path = base_path('packages/'.$this->argument('package')).'/src/Providers';
 
-        return $path . '/' . $this->getClassName() . '.php';
+        return "$path/{$this->getClassName()}.php";
     }
 }

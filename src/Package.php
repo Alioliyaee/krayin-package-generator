@@ -8,8 +8,6 @@ class Package
 {
     /**
      * The constructor.
-     * 
-     * @param  \Illuminate\Filesystem\Filesystem  $filesystem
      */
     public function __construct(Filesystem $filesystem)
     {
@@ -20,11 +18,11 @@ class Package
      * Checks if package exist or not
      *
      * @param  strign  $package
-     * @return boolean
+     * @return bool
      */
     public function has($package)
     {
-        return $this->filesystem->isDirectory(base_path('packages/' . $package));
+        return $this->filesystem->isDirectory(base_path('packages/'.$package));
     }
 
     /**
@@ -35,6 +33,6 @@ class Package
      */
     public function delete($package)
     {
-        $this->filesystem->deleteDirectory(base_path('packages/' . $package));
+        $this->filesystem->deleteDirectory(base_path('packages/'.$package));
     }
 }

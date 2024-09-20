@@ -2,8 +2,9 @@
 
 namespace Webkul\PackageGenerator\Console\Command;
 
-use Webkul\PackageGenerator\Generators\PackageGenerator;
+use Symfony\Component\Console\Attribute\AsCommand;
 
+#[AsCommand(name: 'package:make')]
 class PackageMakeCommand extends MakeCommand
 {
     /**
@@ -12,6 +13,13 @@ class PackageMakeCommand extends MakeCommand
      * @var string
      */
     protected $signature = 'package:make {package} {--plain}  {--force}';
+
+    /**
+     * The type of class being generated.
+     *
+     * @var string
+     */
+    protected $type = 'Package';
 
     /**
      * The console command description.
@@ -25,7 +33,9 @@ class PackageMakeCommand extends MakeCommand
      */
     public function handle()
     {
-        $this->packageGenerator->setConsole($this)
+        $this->packageGenerator
+            ->setPackageGenerator($this)
+            ->setConsole($this->components)
             ->setPackage($this->argument('package'))
             ->setPlain($this->option('plain'))
             ->setForce($this->option('force'))

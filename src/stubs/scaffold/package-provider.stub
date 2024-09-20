@@ -16,18 +16,14 @@ class $CLASS$ extends ServiceProvider
     {
         $this->loadMigrationsFrom(__DIR__ . '/../Database/Migrations');
 
-        $this->loadRoutesFrom(__DIR__ . '/../Http/routes.php');
+        $this->loadRoutesFrom(__DIR__ . '/../Routes/web.php');
 
         $this->loadTranslationsFrom(__DIR__ . '/../Resources/lang', '$LOWER_NAME$');
 
-        $this->publishes([
-            __DIR__ . '/../../publishable/assets' => public_path('$LOWER_NAME$/assets'),
-        ], 'public');
-
         $this->loadViewsFrom(__DIR__ . '/../Resources/views', '$LOWER_NAME$');
 
-        Event::listen('admin.layout.head', function($viewRenderEventManager) {
-            $viewRenderEventManager->addTemplate('$LOWER_NAME$::layouts.style');
+        Event::listen('admin.layout.head.after', function($viewRenderEventManager) {
+            $viewRenderEventManager->addTemplate('$LOWER_NAME$::components.layouts.style');
         });
     }
 

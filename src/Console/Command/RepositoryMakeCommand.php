@@ -2,6 +2,9 @@
 
 namespace Webkul\PackageGenerator\Console\Command;
 
+use Symfony\Component\Console\Attribute\AsCommand;
+
+#[AsCommand(name: 'package:make-repository')]
 class RepositoryMakeCommand extends MakeCommand
 {
     /**
@@ -12,6 +15,11 @@ class RepositoryMakeCommand extends MakeCommand
     protected $signature = 'package:make-repository {name} {package} {--force}';
 
     /**
+     * The type of class being generated.
+     */
+    protected $type = 'Repository';
+
+    /**
      * The console command description.
      *
      * @var string
@@ -19,39 +27,39 @@ class RepositoryMakeCommand extends MakeCommand
     protected $description = 'Create a new repository.';
 
     /**
-     * @return mixed
+     * Get the stub file for the generator.
      */
-    protected function getStubContents()
+    protected function getStubContents(): string
     {
         return $this->packageGenerator->getStubContents('repository', $this->getStubVariables());
     }
 
     /**
-     * @return array
+     * Get the stub variables.
      */
-    protected function getStubVariables()
+    protected function getStubVariables(): array
     {
         return [
-            'NAMESPACE'      => $this->getClassNamespace($this->argument('package') . '/Repositories'),
+            'NAMESPACE'      => $this->getClassNamespace($this->argument('package').'/Repositories'),
             'CLASS'          => $this->getClassName(),
-            'CONTRACT_CLASS' => $this->getClassNamespace($this->argument('package') . '/Contracts/' . $this->getContractName()),
+            'CONTRACT_CLASS' => $this->getClassNamespace($this->argument('package').'/Contracts/'.$this->getContractName()),
         ];
     }
 
     /**
-     * @return string
+     * Get the source file path.
      */
-    protected function getSourceFilePath()
+    protected function getSourceFilePath(): string
     {
-        $path = base_path('packages/' . $this->argument('package')) . '/src/Repositories';
+        $path = base_path('packages/'.$this->argument('package')).'/src/Repositories';
 
-        return $path . '/' . $this->getClassName() . '.php';
+        return "$path/{$this->getClassName()}.php";
     }
 
     /**
-     * @return string
+     * Get the contract name.
      */
-    protected function getContractName()
+    protected function getContractName(): string
     {
         return str_replace('Repository', '', $this->argument('name'));
     }

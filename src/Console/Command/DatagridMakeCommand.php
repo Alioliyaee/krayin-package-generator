@@ -2,6 +2,9 @@
 
 namespace Webkul\PackageGenerator\Console\Command;
 
+use Symfony\Component\Console\Attribute\AsCommand;
+
+#[AsCommand(name: 'package:make-datagrid')]
 class DatagridMakeCommand extends MakeCommand
 {
     /**
@@ -12,6 +15,13 @@ class DatagridMakeCommand extends MakeCommand
     protected $signature = 'package:make-datagrid {name} {package} {--force}';
 
     /**
+     * The type of class being generated.
+     *
+     * @var string
+     */
+    protected $type = 'Datagrid';
+
+    /**
      * The console command description.
      *
      * @var string
@@ -19,31 +29,31 @@ class DatagridMakeCommand extends MakeCommand
     protected $description = 'Create a new datagrid.';
 
     /**
-     * @return mixed
+     * Get the stub file for the generator.
      */
-    protected function getStubContents()
+    protected function getStubContents(): string
     {
         return $this->packageGenerator->getStubContents('datagrid', $this->getStubVariables());
     }
 
     /**
-     * @return array
+     * Get the stub variables.
      */
-    protected function getStubVariables()
+    protected function getStubVariables(): array
     {
         return [
-            'NAMESPACE' => $this->getClassNamespace($this->argument('package') . '/Datagrids'),
+            'NAMESPACE' => $this->getClassNamespace($this->argument('package').'/DataGrids'),
             'CLASS'     => $this->getClassName(),
         ];
     }
 
     /**
-     * @return string
+     * Get the source file path.
      */
-    protected function getSourceFilePath()
+    protected function getSourceFilePath(): string
     {
-        $path = base_path('packages/' . $this->argument('package')) . '/src/Datagrids';
+        $path = base_path('packages/'.$this->argument('package')).'/src/DataGrids';
 
-        return $path . '/' . $this->getClassName() . '.php';
+        return "$path/{$this->getClassName()}.php";
     }
 }
