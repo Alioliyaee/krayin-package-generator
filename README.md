@@ -10,7 +10,7 @@ It packs in lots of demanding features that allows your business to scale in no 
 
 ## 2. Requirements
 
-* **Krayin**: v1.0.0 or higher.
+* **Krayin**: v2.0.0 or higher.
 
 ## 3. Installation
 
@@ -28,7 +28,7 @@ composer require krayin/krayin-package-generator
 
 After setting up, you will see that there are list of package commands which help you to make your package creation smooth.
 
-Below are the list of commands,
+Below are the list of commands, If no arguments are passed, it will prompt for the required argument.
 
 | S. No. | Commands                               | Info                                                                                                            | Required Arguments                     | Optional Arguments  |
 | :----- | :------------------------------------- | :-------------------------------------------------------------------------------------------------------------- | :------------------------------------- | :------------------ |
