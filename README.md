@@ -10,7 +10,7 @@ It packs in lots of demanding features that allows your business to scale in no 
 
 ## 2. Requirements
 
-* **Krayin**: v2.0.0 or higher.
+* **Krayin**: v2.0.x
 
 ## 3. Installation
 
