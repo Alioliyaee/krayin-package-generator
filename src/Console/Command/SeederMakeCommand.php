@@ -2,6 +2,9 @@
 
 namespace Webkul\PackageGenerator\Console\Command;
 
+use Symfony\Component\Console\Attribute\AsCommand;
+
+#[AsCommand(name: 'package:make-seeder')]
 class SeederMakeCommand extends MakeCommand
 {
     /**
@@ -12,6 +15,13 @@ class SeederMakeCommand extends MakeCommand
     protected $signature = 'package:make-seeder {name} {package} {--force}';
 
     /**
+     * The type of class being generated.
+     *
+     * @var string
+     */
+    protected $type = 'Seeder';
+
+    /**
      * The console command description.
      *
      * @var string
@@ -19,32 +29,31 @@ class SeederMakeCommand extends MakeCommand
     protected $description = 'Create a new seeder.';
 
     /**
-     * @return mixed
+     * Get the stub file for the generator.
      */
-    protected function getStubContents()
+    protected function getStubContents(): string
     {
         return $this->packageGenerator->getStubContents('seeder', $this->getStubVariables());
     }
 
     /**
-     * @return array
+     * Get the stub variables.
      */
-    protected function getStubVariables()
+    protected function getStubVariables(): array
     {
         return [
-            'NAMESPACE' => $this->getClassNamespace($this->argument('package') . '/Database/Seeders'),
+            'NAMESPACE' => $this->getClassNamespace($this->argument('package').'/Database/Seeders'),
             'CLASS'     => $this->getClassName(),
         ];
     }
 
     /**
-     * @return string
+     * Get the source file path.
      */
-    protected function getSourceFilePath()
+    protected function getSourceFilePath(): string
     {
-        $path = base_path('packages/' . $this->argument('package')) . '/src/Database/Seeders';
+        $path = base_path('packages/'.$this->argument('package')).'/src/Database/Seeders';
 
-        return $path . '/' . $this->getClassName() . '.php';
+        return "$path/{$this->getClassName()}.php";
     }
-    
 }

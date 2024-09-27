@@ -2,6 +2,9 @@
 
 namespace Webkul\PackageGenerator\Console\Command;
 
+use Symfony\Component\Console\Attribute\AsCommand;
+
+#[AsCommand(name: 'package:make-middleware')]
 class MiddlewareMakeCommand extends MakeCommand
 {
     /**
@@ -12,6 +15,13 @@ class MiddlewareMakeCommand extends MakeCommand
     protected $signature = 'package:make-middleware {name} {package} {--force}';
 
     /**
+     * The type of class being generated.
+     *
+     * @var string
+     */
+    protected $type = 'Middleware';
+
+    /**
      * The console command description.
      *
      * @var string
@@ -19,31 +29,31 @@ class MiddlewareMakeCommand extends MakeCommand
     protected $description = 'Create a new middleware.';
 
     /**
-     * @return mixed
+     * Get the stub file for the generator.
      */
-    protected function getStubContents()
+    protected function getStubContents(): string
     {
         return $this->packageGenerator->getStubContents('middleware', $this->getStubVariables());
     }
 
     /**
-     * @return array
+     * Get the stub variables.
      */
-    protected function getStubVariables()
+    protected function getStubVariables(): array
     {
         return [
-            'NAMESPACE' => $this->getClassNamespace($this->argument('package') . '/Http/Middleware'),
+            'NAMESPACE' => $this->getClassNamespace($this->argument('package').'/Http/Middleware'),
             'CLASS'     => $this->getClassName(),
         ];
     }
 
     /**
-     * @return string
+     * Get the source file path.
      */
-    protected function getSourceFilePath()
+    protected function getSourceFilePath(): string
     {
-        $path = base_path('packages/' . $this->argument('package')) . '/src/Http/Middleware';
+        $path = base_path('packages/'.$this->argument('package')).'/src/Http/Middleware';
 
-        return $path . '/' . $this->getClassName() . '.php';
+        return "$path/{$this->getClassName()}.php";
     }
 }

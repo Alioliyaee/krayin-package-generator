@@ -2,6 +2,9 @@
 
 namespace Webkul\PackageGenerator\Console\Command;
 
+use Symfony\Component\Console\Attribute\AsCommand;
+
+#[AsCommand(name: 'package:make-model-proxy')]
 class ModelProxyMakeCommand extends MakeCommand
 {
     /**
@@ -12,6 +15,13 @@ class ModelProxyMakeCommand extends MakeCommand
     protected $signature = 'package:make-model-proxy {name} {package} {--force}';
 
     /**
+     * The type of class being generated.
+     *
+     * @var string
+     */
+    protected $type = 'Model Proxy';
+
+    /**
      * The console command description.
      *
      * @var string
@@ -19,32 +29,31 @@ class ModelProxyMakeCommand extends MakeCommand
     protected $description = 'Create a new model proxy.';
 
     /**
-     * @return mixed
+     * Get the stub file for the generator.
      */
-    protected function getStubContents()
+    protected function getStubContents(): string
     {
         return $this->packageGenerator->getStubContents('model-proxy', $this->getStubVariables());
     }
 
     /**
-     * @return array
+     * Get the stub variables.
      */
-    protected function getStubVariables()
+    protected function getStubVariables(): array
     {
         return [
-            'NAMESPACE' => $this->getClassNamespace($this->argument('package') . '/Models'),
+            'NAMESPACE' => $this->getClassNamespace($this->argument('package').'/Models'),
             'CLASS'     => $this->getClassName(),
         ];
     }
 
     /**
-     * @return string
+     * Get the source file path.
      */
-    protected function getSourceFilePath()
+    protected function getSourceFilePath(): string
     {
-        $path = base_path('packages/' . $this->argument('package')) . '/src/Models';
+        $path = base_path('packages/'.$this->argument('package')).'/src/Models';
 
-        return $path . '/' . $this->getClassName() . '.php';
+        return "$path/{$this->getClassName()}.php";
     }
-    
 }

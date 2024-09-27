@@ -2,6 +2,9 @@
 
 namespace Webkul\PackageGenerator\Console\Command;
 
+use Symfony\Component\Console\Attribute\AsCommand;
+
+#[AsCommand(name: 'package:make-model')]
 class ModelMakeCommand extends MakeCommand
 {
     /**
@@ -10,6 +13,13 @@ class ModelMakeCommand extends MakeCommand
      * @var string
      */
     protected $signature = 'package:make-model {name} {package} {--force}';
+
+    /**
+     * The type of class being generated.
+     *
+     * @var string
+     */
+    protected $type = 'Model';
 
     /**
      * The console command description.
@@ -26,7 +36,7 @@ class ModelMakeCommand extends MakeCommand
         parent::handle();
 
         $this->call('package:make-model-proxy', [
-            'name'    => $this->argument('name') . 'Proxy',
+            'name'    => $this->argument('name').'Proxy',
             'package' => $this->argument('package'),
             '--force' => $this->option('force'),
         ]);
@@ -39,32 +49,32 @@ class ModelMakeCommand extends MakeCommand
     }
 
     /**
-     * @return mixed
+     * Get the stub file for the generator.
      */
-    protected function getStubContents()
+    protected function getStubContents(): string
     {
         return $this->packageGenerator->getStubContents('model', $this->getStubVariables());
     }
 
     /**
-     * @return array
+     * Get the stub variables.
      */
-    protected function getStubVariables()
+    protected function getStubVariables(): array
     {
         return [
             'PACKAGE'   => $this->getClassNamespace($this->argument('package')),
-            'NAMESPACE' => $this->getClassNamespace($this->argument('package') . '/Models'),
+            'NAMESPACE' => $this->getClassNamespace($this->argument('package').'/Models'),
             'CLASS'     => $this->getClassName(),
         ];
     }
 
     /**
-     * @return string
+     * Get the source file path.
      */
-    protected function getSourceFilePath()
+    protected function getSourceFilePath(): string
     {
-        $path = base_path('packages/' . $this->argument('package')) . '/src/Models';
+        $path = base_path('packages/'.$this->argument('package')).'/src/Models';
 
-        return $path . '/' . $this->getClassName() . '.php';
+        return "$path/{$this->getClassName()}.php";
     }
 }

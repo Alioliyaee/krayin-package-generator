@@ -2,6 +2,9 @@
 
 namespace Webkul\PackageGenerator\Console\Command;
 
+use Symfony\Component\Console\Attribute\AsCommand;
+
+#[AsCommand(name: 'package:make-command')]
 class CommandMakeCommand extends MakeCommand
 {
     /**
@@ -12,38 +15,45 @@ class CommandMakeCommand extends MakeCommand
     protected $signature = 'package:make-command {name} {package} {--force}';
 
     /**
-     * The console command description.
+     * The type of class being generated.
      *
      * @var string
+     */
+    protected $type = 'Console command';
+
+    /**
+     * The console command description.
+     *
+     * @var string|null
      */
     protected $description = 'Create a new command.';
 
     /**
-     * @return mixed
+     * Get the stub file for the generator.
      */
-    protected function getStubContents()
+    protected function getStubContents(): string
     {
         return $this->packageGenerator->getStubContents('command', $this->getStubVariables());
     }
 
     /**
-     * @return array
+     * Get the stub variables.
      */
-    protected function getStubVariables()
+    protected function getStubVariables(): array
     {
         return [
-            'NAMESPACE' => $this->getClassNamespace($this->argument('package') . '/Console/Commands'),
+            'NAMESPACE' => $this->getClassNamespace($this->argument('package').'/Console/Commands'),
             'CLASS'     => $this->getClassName(),
         ];
     }
 
     /**
-     * @return string
+     * Get the source file path.
      */
-    protected function getSourceFilePath()
+    protected function getSourceFilePath(): string
     {
-        $path = base_path('packages/' . $this->argument('package')) . '/src/Console/Commands';
+        $path = base_path('packages/'.$this->argument('package')).'/src/Console/Commands';
 
-        return $path . '/' . $this->getClassName() . '.php';
+        return "$path/{$this->getClassName()}.php";
     }
 }

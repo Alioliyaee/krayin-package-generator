@@ -2,6 +2,9 @@
 
 namespace Webkul\PackageGenerator\Console\Command;
 
+use Symfony\Component\Console\Attribute\AsCommand;
+
+#[AsCommand(name: 'package:make-mail')]
 class MailMakeCommand extends MakeCommand
 {
     /**
@@ -12,6 +15,13 @@ class MailMakeCommand extends MakeCommand
     protected $signature = 'package:make-mail {name} {package} {--force}';
 
     /**
+     * The type of class being generated.
+     *
+     * @var string
+     */
+    protected $type = 'Mailable';
+
+    /**
      * The console command description.
      *
      * @var string
@@ -19,31 +29,32 @@ class MailMakeCommand extends MakeCommand
     protected $description = 'Create a new mail.';
 
     /**
-     * @return mixed
+     * Get the stub file for the generator.
      */
-    protected function getStubContents()
+    protected function getStubContents(): string
     {
         return $this->packageGenerator->getStubContents('mail', $this->getStubVariables());
     }
 
     /**
-     * @return array
+     * Get the stub variables.
      */
-    protected function getStubVariables()
+    protected function getStubVariables(): array
     {
         return [
-            'NAMESPACE' => $this->getClassNamespace($this->argument('package') . '/Mail'),
-            'CLASS'     => $this->getClassName(),
+            'NAMESPACE'  => $this->getClassNamespace($this->argument('package').'/Mails'),
+            'CLASS'      => $this->getClassName(),
+            'LOWER_NAME' => $this->getLowerName(),
         ];
     }
 
     /**
-     * @return string
+     * Get the source file path.
      */
-    protected function getSourceFilePath()
+    protected function getSourceFilePath(): string
     {
-        $path = base_path('packages/' . $this->argument('package')) . '/src/Mail';
+        $path = base_path('packages/'.$this->argument('package')).'/src/Mails';
 
-        return $path . '/' . $this->getClassName() . '.php';
+        return "$path/{$this->getClassName()}.php";
     }
 }

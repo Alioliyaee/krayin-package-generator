@@ -2,9 +2,9 @@
 
 namespace Webkul\PackageGenerator\Console\Command;
 
-use Illuminate\Support\Str;
-use Webkul\PackageGenerator\Generators\PackageGenerator;
+use Symfony\Component\Console\Attribute\AsCommand;
 
+#[AsCommand(name: 'package:make-route')]
 class RouteMakeCommand extends MakeCommand
 {
     /**
@@ -15,6 +15,13 @@ class RouteMakeCommand extends MakeCommand
     protected $signature = 'package:make-route {package} {--force}';
 
     /**
+     * The type of class being generated.
+     *
+     * @var string
+     */
+    protected $type = 'Route';
+
+    /**
      * The console command description.
      *
      * @var string
@@ -22,31 +29,32 @@ class RouteMakeCommand extends MakeCommand
     protected $description = 'Create a new route file.';
 
     /**
-     * @return mixed
+     * Get the stub file for the generator.
      */
-    protected function getStubContents()
+    protected function getStubContents(): string
     {
         return $this->packageGenerator->getStubContents('routes', $this->getStubVariables());
     }
 
     /**
-     * @return array
+     * Get the stub variables.
      */
-    protected function getStubVariables()
+    protected function getStubVariables(): array
     {
         return [
-            'CONTROLLER_CLASS_NAME' => $this->getClassNamespace($this->argument('package') . '/Http/Controllers/' . $this->getStudlyName() . 'Controller'),
+            'CONTROLLER_CLASS_NAME' => $this->getClassNamespace($this->argument('package').'/Http/Controllers/'.$this->getStudlyName().'Controller'),
             'LOWER_NAME'            => $this->getLowerName(),
+            'CLASS_NAME'            => "{$this->getStudlyName()}Controller",
         ];
     }
 
     /**
-     * @return string
+     * Get the source file path.
      */
-    protected function getSourceFilePath()
+    protected function getSourceFilePath(): string
     {
-        $path = base_path('packages/' . $this->argument('package')) . '/src/Http';
+        $path = base_path('packages/'.$this->argument('package')).'/src/Routes';
 
-        return $path . '/routes.php';
+        return "$path/web.php";
     }
 }

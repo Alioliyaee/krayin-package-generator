@@ -2,6 +2,9 @@
 
 namespace Webkul\PackageGenerator\Console\Command;
 
+use Symfony\Component\Console\Attribute\AsCommand;
+
+#[AsCommand(name: 'package:make-listener')]
 class ListenerMakeCommand extends MakeCommand
 {
     /**
@@ -12,6 +15,13 @@ class ListenerMakeCommand extends MakeCommand
     protected $signature = 'package:make-listener {name} {package} {--force}';
 
     /**
+     * The type of class being generated.
+     *
+     * @var string
+     */
+    protected $type = 'Listener';
+
+    /**
      * The console command description.
      *
      * @var string
@@ -19,31 +29,31 @@ class ListenerMakeCommand extends MakeCommand
     protected $description = 'Create a new listener.';
 
     /**
-     * @return mixed
+     * Get the stub file for the generator.
      */
-    protected function getStubContents()
+    protected function getStubContents(): string
     {
         return $this->packageGenerator->getStubContents('listener', $this->getStubVariables());
     }
 
     /**
-     * @return array
+     * Get the stub variables.
      */
-    protected function getStubVariables()
+    protected function getStubVariables(): array
     {
         return [
-            'NAMESPACE' => $this->getClassNamespace($this->argument('package') . '/Listeners'),
+            'NAMESPACE' => $this->getClassNamespace($this->argument('package').'/Listeners'),
             'CLASS'     => $this->getClassName(),
         ];
     }
 
     /**
-     * @return string
+     * Get the source file path.
      */
-    protected function getSourceFilePath()
+    protected function getSourceFilePath(): string
     {
-        $path = base_path('packages/' . $this->argument('package')) . '/src/Listeners';
+        $path = base_path('packages/'.$this->argument('package')).'/src/Listeners';
 
-        return $path . '/' . $this->getClassName() . '.php';
+        return "$path/{$this->getClassName()}.php";
     }
 }

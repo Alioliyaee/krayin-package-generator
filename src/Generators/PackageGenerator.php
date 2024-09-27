@@ -4,82 +4,80 @@ namespace Webkul\PackageGenerator\Generators;
 
 use Illuminate\Config\Repository as Config;
 use Illuminate\Filesystem\Filesystem;
-use Illuminate\Support\Str;
 use Webkul\PackageGenerator\Package;
 
 class PackageGenerator
 {
     /**
-     * The package vendor namespace
+     * The package vendor namespace.
      *
      * @var string
      */
     protected $vendorNamespace;
 
     /**
-     * The package name
+     * The package name.
      *
      * @var string
      */
     protected $packageName;
 
     /**
-     * Repository object
+     * The plain agument.
      *
-     * @var \Illuminate\Config\Repository
-     */
-    protected $config;
-
-    /**
-     * Filesystem object
-     *
-     * @var \Illuminate\Filesystem\Filesystem
-     */
-    protected $filesystem;
-
-    /**
-     * Package object
-     *
-     * @var string
-     */
-    protected $package;
-
-    /**
-     * @var boolean
+     * @var bool
      */
     protected $plain;
 
     /**
-     * @var boolean
+     * The argument that make force the overrides.
+     *
+     * @var bool
      */
     protected $force;
 
     /**
-     * @var boolean
+     * Define the type of package.
+     *
+     * @var string
      */
     protected $type = 'package';
 
     /**
+     * Contains console instance
+     *
+     * @var \Illuminate\Console\Command
+     */
+    protected $console;
+
+    /**
+     * Contains generator instance
+     *
+     * @var \Webkul\PackageGenerator\Console\Command
+     */
+    protected $generator;
+
+    /**
      * Contains subs files information
      *
-     * @var string
+     * @var array
      */
     protected $stubFiles = [
         'package'  => [
-            'views/layouts/style'                        => 'Resources/views/layouts/style.blade.php',
+            'views/components/layouts/style'             => 'Resources/views/components/layouts/style.blade.php',
             'views/index'                                => 'Resources/views/index.blade.php',
             'scaffold/menu'                              => 'Config/menu.php',
             'scaffold/acl'                               => 'Config/acl.php',
             'assets/js/app'                              => 'Resources/assets/js/app.js',
-            'assets/sass/admin'                          => 'Resources/assets/sass/admin.scss',
+            'assets/css/app'                             => 'Resources/assets/css/app.css',
             'assets/images/Icon-Temp'                    => 'Resources/assets/images/Icon-Temp.svg',
             'assets/images/Icon-Temp-Active'             => 'Resources/assets/images/Icon-Temp-Active.svg',
-            'assets/publishable/css/admin'               => '../publishable/assets/css/admin.css',
-            'assets/publishable/js/app'                  => '../publishable/assets/js/app.js',
-            'assets/publishable/images/Icon-Temp'        => '../publishable/assets/images/Icon-Temp.svg',
-            'assets/publishable/images/Icon-Temp-Active' => '../publishable/assets/images/Icon-Temp-Active.svg',
-            'webpack'                                    => '../webpack.mix.js',
             'package'                                    => '../package.json',
+            'vite'                                       => '../vite.config.js',
+            'tailwind'                                   => '../tailwind.config.js',
+            'postcss'                                    => '../postcss.config.js',
+            '.gitignore'                                 => '../.gitignore',
+            'composer'                                   => '../composer.json',
         ],
     ];
 
@@ -112,32 +110,30 @@ class PackageGenerator
     ];
 
     /**
-     * The constructor.
-     * 
-     * @param  \Illuminate\Config\Repository  $config
-     * @param  \Illuminate\Filesystem\Filesystem  $filesystem
-     * @param  \Webkul\PackageGenerator\Package  $package
+     * Create a new generator instance.
+     *
+     * @return void
      */
     public function __construct(
-        Config $config,
-        Filesystem $filesystem,
-        Package $package
-    )
+        protected Config $config,
+        protected Filesystem $filesystem,
+        protected Package $package
+    ) {}
+
+    /**
+     * Set generator
+     */
+    public function setPackageGenerator(mixed $generator): self
     {
-        $this->config = $config;
+        $this->generator = $generator;
 
-        $this->filesystem = $filesystem;
-
-        $this->package = $package;
+        return $this;
     }
 
     /**
-     * Set console 
-     *
-     * @param  \Illuminate\Console\Command  $console
-     * @return Webkul\PackageGenerator\Generators\PackageGenerator
+     * Set console
      */
-    public function setConsole($console)
+    public function setConsole(mixed $console): self
     {
         $this->console = $console;
 
@@ -146,11 +142,8 @@ class PackageGenerator
 
     /**
      * Set package.
-     *
-     * @param  string  $packageName
-     * @return Webkul\PackageGenerator\Generators\PackageGenerator
      */
-    public function setPackage($packageName)
+    public function setPackage(mixed $packageName): self
     {
         $this->packageName = $packageName;
 
@@ -159,11 +152,8 @@ class PackageGenerator
 
     /**
      * Set package plain.
-     *
-     * @param  string  $plain
-     * @return Webkul\PackageGenerator\Generators\PackageGenerator
      */
-    public function setPlain($plain)
+    public function setPlain(mixed $plain): self
     {
         $this->plain = $plain;
 
@@ -172,11 +162,8 @@ class PackageGenerator
 
     /**
      * Set force status.
-     *
-     * @param  boolean  $force
-     * @return \Webkul\PackageGenerator\Generators\PackageGenerator
      */
-    public function setForce($force)
+    public function setForce(mixed $force): self
     {
         $this->force = $force;
 
@@ -185,11 +172,8 @@ class PackageGenerator
 
     /**
      * Set type status.
-     *
-     * @param  boolean  $isPaymentPackage
-     * @return \Webkul\PackageGenerator\Generators\PackageGenerator
      */
-    public function setType($type)
+    public function setType(string $type): self
     {
         $this->type = $type;
 
@@ -198,16 +182,14 @@ class PackageGenerator
 
     /**
      * Generate package
-     *
-     * @return void
      */
-    public function generate()
+    public function generate(): void
     {
         if ($this->package->has($this->packageName)) {
             if ($this->force) {
                 $this->package->delete($this->packageName);
             } else {
-                $this->console->error("Package '{$this->packageName}' already exist !");
+                $this->console->error(sprintf('Package %s already exist !', $this->packageName));
 
                 return;
             }
@@ -221,18 +203,16 @@ class PackageGenerator
             $this->createClasses();
         }
 
-        $this->console->info("Package '{$this->packageName}' created successfully.");
+        $this->console->info(sprintf('Package %s created successfully.', $this->packageName));
     }
 
     /**
      * Generate package folders
-     *
-     * @return void
      */
-    public function createFolders()
+    public function createFolders(): void
     {
         foreach ($this->paths[$this->type] as $key => $folder) {
-            $path = base_path('packages/' . $this->packageName . '/src') . '/' . $folder;
+            $path = base_path('packages/'.$this->packageName.'/src').'/'.$folder;
 
             $this->filesystem->makeDirectory($path, 0755, true);
         }
@@ -240,15 +220,13 @@ class PackageGenerator
 
     /**
      * Generate package files
-     *
-     * @return void
      */
-    public function createFiles()
+    public function createFiles(): void
     {
         $variables = $this->getStubVariables();
 
         foreach ($this->stubFiles[$this->type] as $stub => $file) {
-            $path = base_path('packages/' . $this->packageName . '/src') . '/' . $file;
+            $path = base_path('packages/'.$this->packageName.'/src').'/'.$file;
 
             if (! $this->filesystem->isDirectory($dir = dirname($path))) {
                 $this->filesystem->makeDirectory($dir, 0775, true);
@@ -262,37 +240,35 @@ class PackageGenerator
 
     /**
      * Generate package classes
-     *
-     * @return void
      */
-    public function createClasses()
+    public function createClasses(): void
     {
         if ($this->type == 'package') {
-            $this->console->call('package:make-provider', [
-                'name'    => $this->packageName . 'ServiceProvider',
+            $this->generator->call('package:make-provider', [
+                'name'    => $this->packageName.'ServiceProvider',
                 'package' => $this->packageName,
             ]);
 
-            $this->console->call('package:make-module-provider', [
+            $this->generator->call('package:make-module-provider', [
                 'name'    => 'ModuleServiceProvider',
                 'package' => $this->packageName,
             ]);
 
-            $this->console->call('package:make-controller', [
-                'name'    => $this->packageName . 'Controller',
-                'package' => $this->packageName
+            $this->generator->call('package:make-controller', [
+                'name'    => $this->packageName.'Controller',
+                'package' => $this->packageName,
             ]);
 
-            $this->console->call('package:make-route', [
-                'package' => $this->packageName
+            $this->generator->call('package:make-route', [
+                'package' => $this->packageName,
             ]);
         }
     }
 
     /**
-     * @return array
+     * Get the variables for the stub file.
      */
-    protected function getStubVariables()
+    protected function getStubVariables(): array
     {
         return [
             'LOWER_NAME'      => $this->getLowerName(),
@@ -303,54 +279,49 @@ class PackageGenerator
     }
 
     /**
-     * @return string
+     * Get the class name of the package.
      */
-    protected function getClassName()
+    protected function getClassName(): string
     {
         return class_basename($this->packageName);
     }
 
     /**
-     * @param  string  $name
-     * @return string
+     * Get the class namespace of the package.
      */
-    protected function getClassNamespace($name)
+    protected function getClassNamespace($name): array|string
     {
         return str_replace('/', '\\', $name);
     }
 
     /**
      * Returns content of stub file
-     *
-     * @param  string  $stub
-     * @param  array  $variables
-     * @return string
      */
-    public function getStubContents($stub, $variables = [])
+    public function getStubContents(string $stub, array $variables = []): mixed
     {
-        $path = __DIR__ . '/../stubs/' . $stub . '.stub';
+        $path = __DIR__.'/../stubs/'.$stub.'.stub';
 
         $contents = file_get_contents($path);
 
         foreach ($variables as $search => $replace) {
-            $contents = str_replace('$' . strtoupper($search) . '$', $replace, $contents);
+            $contents = str_replace('$'.strtoupper($search).'$', $replace, $contents);
         }
 
         return $contents;
     }
 
     /**
-     * @return string
+     * Get the capitalize name of the package.
      */
-    protected function getCapitalizeName()
+    protected function getCapitalizeName(): string
     {
         return ucwords(class_basename($this->packageName));
     }
 
     /**
-     * @return string
+     * Get the lower name of the package.
      */
-    protected function getLowerName()
+    protected function getLowerName(): string
     {
         return strtolower(class_basename($this->packageName));
     }

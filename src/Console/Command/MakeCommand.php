@@ -3,45 +3,35 @@
 namespace Webkul\PackageGenerator\Console\Command;
 
 use Illuminate\Console\Command;
+use Illuminate\Contracts\Console\PromptsForMissingInput;
 use Illuminate\Filesystem\Filesystem;
-use Illuminate\Support\Str;
 use Webkul\PackageGenerator\Generators\PackageGenerator;
 
-class MakeCommand extends Command
+class MakeCommand extends Command implements PromptsForMissingInput
 {
     /**
-     * Filesystem object
+     * The type of class being generated.
      *
-     * @var \Illuminate\Filesystem\Filesystem
+     * @var string
      */
-    protected $filesystem;
-
-    /**
-     * PackageGenerator object
-     *
-     * @var \Webkul\PackageGenerator\Generators\PackageGenerator
-     */
-    protected $packageGenerator;
+    protected $type;
 
     /**
      * Create a new command instance.
      *
-     * @param  \Illuminate\Filesystem\Filesystem  $filesystem
-     * @param  \Webkul\PackageGenerator\Generators\PackageGenerator  $packageGenerator
      * @return void
      */
     public function __construct(
-        Filesystem  $filesystem,
-        PackageGenerator $packageGenerator
-    )
-    {
+        protected Filesystem $filesystem,
+        protected PackageGenerator $packageGenerator
+    ) {
+        parent::__construct();
+
         $this->filesystem = $filesystem;
 
         $this->packageGenerator = $packageGenerator;
-
-        parent::__construct();
     }
-    
+
     /**
      * Execute the console command.
      */
@@ -61,47 +51,77 @@ class MakeCommand extends Command
             if ($this->option('force')) {
                 $this->filesystem->put($path, $contents);
             } else {
-                $this->error("File : {$path} already exists.");
+                $this->components->error(sprintf('%s [%s] already exists.', $this->type, $path));
 
                 return;
             }
         }
 
-        $this->info("File Created : {$path}");
+        $this->components->info(sprintf('%s [%s] created successfully.', $this->type, $path));
     }
 
     /**
      * Get name in studly case.
-     *
-     * @return string
      */
-    public function getStudlyName()
+    public function getStudlyName(): string
     {
         return class_basename($this->argument('package'));
     }
 
     /**
-     * @return string
+     * Get name in lower case.
      */
-    protected function getLowerName()
+    protected function getLowerName(): string
     {
-        return strtolower(class_basename($this->argument('package')));
+        return strtolower($this->getStudlyName());
     }
 
     /**
-     * @return string
+     * Get the class name.
      */
-    protected function getClassName()
+    protected function getClassName(): string
     {
         return class_basename($this->argument('name'));
     }
 
     /**
-     * @param  string  $name
-     * @return string
+     * Get the class namespace.
      */
-    protected function getClassNamespace($name)
+    protected function getClassNamespace(string $name): array|string
     {
         return str_replace('/', '\\', $name);
+    }
+
+    /**
+     * Prompt for missing input arguments using the returned questions.
+     */
+    protected function promptForMissingArgumentsUsing(): array
+    {
+        return [
+            'name' => [
+                'What should the '.strtolower($this->type).' be named?',
+                match ($this->type) {
+                    'Console command' => 'E.g. SendEmails',
+                    'Controller'      => 'E.g. UserController',
+                    'Datagrid'        => 'E.g. ProductDatagrid',
+                    'Event'           => 'E.g. PodcastProcessed',
+                    'Listener'        => 'E.g. SendPodcastNotification',
+                    'Mailable'        => 'E.g. OrderShipped',
+                    'Middleware'      => 'E.g. EnsureTokenIsValid',
+                    'Migration'       => 'E.g. create_flights_table',
+                    'Model'           => 'E.g. Flight',
+                    'Model Proxy'     => 'E.g. FlightProxy',
+                    'Contract'        => 'E.g. Flight',
+                    'Module Provider' => 'E.g. ModuleServiceProvider',
+                    'Provider'        => 'E.g. ElasticServiceProvider',
+                    'Notification'    => 'E.g. InvoicePaid',
+                    'Repository'      => 'E.g. UserRepository',
+                    'Request'         => 'E.g. StorePodcastRequest',
+                    'Route'           => 'E.g. web',
+                    'Seeder'          => 'E.g. UserSeeder',
+                    default           => '',
+                },
+            ],
+        ];
     }
 }
