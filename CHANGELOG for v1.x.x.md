@@ -1,7 +1,7 @@
-# CHANGELOG for v1.x.x
+# CHANGELOG
 
-#### This changelog consists the bug & security fixes and new features being included in the releases listed below.
+This changelog consists the bug & security fixes and new features being included in the releases listed below.
 
-## **v1.0.0(26th of July, 2021)** - _Release_
+## **v1.0.0 (27th of September, 2024)** - _Release_
 
 - [feature] Create package with a single command.
